@@ -1,0 +1,13 @@
+# build output
+.build/
+build/
+out/
+*.xcuserstate
+.DS_Store
+.swiftpm/
+
+# private screenshots: never committed, never needed by tests
+corpus/private/
+
+# Codex's review evidence and scratch reports (owned by the reviewer, not part of the product source)
+reports/
