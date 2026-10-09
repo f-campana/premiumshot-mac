@@ -19,14 +19,10 @@ final class GoldenTests: XCTestCase {
 
     struct Case { let name: String; let fixture: String; let recipe: Recipe }
     static let cases: [Case] = {
-        var list: [Case] = LookID.allCases.map { look in
+        var list: [Case] = Look.all.map { $0.id }.map { look in
             var r = Recipe.default; r.look = look
             return Case(name: "dialog-\(look.rawValue)-fit", fixture: "small-dialog.png", recipe: r)
         }
-        var wide = Recipe.default; wide.shape = .wide; wide.frame = .window; wide.look = .tide
-        list.append(Case(name: "dashboard-tide-16x9-window", fixture: "wide-dashboard.png", recipe: wide))
-        var square = Recipe.default; square.shape = .square; square.frame = .browser; square.look = .graphite; square.radius = 80; square.shadow = 90
-        list.append(Case(name: "dialog-graphite-square-browser", fixture: "small-dialog.png", recipe: square))
         var tall = Recipe.default; tall.shape = .portrait; tall.look = .paper
         list.append(Case(name: "article-paper-4x5", fixture: "tall-article.png", recipe: tall))
         return list

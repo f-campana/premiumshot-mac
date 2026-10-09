@@ -2,17 +2,24 @@ import AppKit
 import PremiumShotCore
 
 /// One image being polished: the decoded original and its recipe. Kept in memory only.
+@MainActor
 public final class SourceSession: Identifiable {
     public let id: UUID
     public let source: SourceImage
+    public var history = StyleHistory()
     public var recipe: Recipe
-    init(id: UUID = UUID(), source: SourceImage, recipe: Recipe) { self.id = id; self.source = source; self.recipe = recipe }
+    init(id: UUID = UUID(), source: SourceImage, recipe: Recipe) {
+        self.id = id
+        self.source = source
+        self.recipe = recipe
+    }
 }
 
 /// The last few sessions, so re-summoning after Copy reopens the original instead of polishing the polished image.
 @MainActor
 public final class SessionStore {
     public static let capacity = 3
+    public static let byteLimit = 512 * 1024 * 1024
     private var sessions: [SourceSession] = []
     public init() {}
 
@@ -20,10 +27,16 @@ public final class SessionStore {
     public func add(source: SourceImage, recipe: Recipe) -> SourceSession {
         let session = SourceSession(source: source, recipe: recipe)
         sessions.append(session)
-        if sessions.count > Self.capacity { sessions.removeFirst(sessions.count - Self.capacity) }
+        while sessions.count > Self.capacity || (decodedBytes > Self.byteLimit && sessions.count > 1) {
+            sessions.removeFirst()
+        }
         return session
     }
     public func session(id: UUID) -> SourceSession? { sessions.first { $0.id == id } }
+    public func remove(id: UUID) { sessions.removeAll { $0.id == id } }
+    public var decodedBytes: Int {
+        sessions.reduce(0) { $0 + $1.source.cgImage.bytesPerRow * $1.source.height }
+    }
     public var count: Int { sessions.count }
 }
 

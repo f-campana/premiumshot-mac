@@ -1,13 +1,11 @@
-# build output
+# Generated build and editor state.
 .build/
 build/
 out/
+.swiftpm/
 *.xcuserstate
 .DS_Store
-.swiftpm/
 
-# private screenshots: never committed, never needed by tests
+# Personal screenshots and local QA output.
 corpus/private/
-
-# Codex's review evidence and scratch reports (owned by the reviewer, not part of the product source)
 reports/

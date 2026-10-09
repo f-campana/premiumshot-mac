@@ -10,16 +10,32 @@ public actor RenderQueue {
     public init() {}
 
     /// Returns nil when a newer preview request arrived first.
-    public func preview(source: SourceImage, recipe: Recipe, profile: ExportProfile = .srgb, height: Int) async throws -> RenderResult? {
+    public func preview(source: SourceImage, recipe: Recipe, profile: ExportProfile = .srgb, height: Int)
+        async throws -> RenderResult?
+    {
         generation += 1
         let mine = generation
-        await Task.yield()                      // let any newer request register before we start
+        await Task.yield()  // let any newer request register before we start
         guard mine == generation else { return nil }
         return try Renderer.renderPreview(source: source, recipe: recipe, profile: profile, height: height)
     }
 
+    public func interactive(source: SourceImage, recipe: Recipe, profile: ExportProfile, height: Int)
+        async throws -> RenderResult?
+    {
+        generation += 1
+        let mine = generation
+        await Task.yield()
+        guard mine == generation else { return nil }
+        try Task.checkCancellation()
+        return try Renderer.renderInteractive(
+            source: source, recipe: recipe, profile: profile, height: height)
+    }
+
     /// Full-size render for Copy, Save and drag-out.
-    public nonisolated func export(source: SourceImage, recipe: Recipe, profile: ExportProfile = .srgb) async throws -> RenderResult {
+    public nonisolated func export(source: SourceImage, recipe: Recipe, profile: ExportProfile = .srgb)
+        async throws -> RenderResult
+    {
         try await Task.detached(priority: .userInitiated) {
             try Renderer.render(source: source, recipe: recipe, profile: profile)
         }.value

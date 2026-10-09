@@ -56,6 +56,7 @@ final class ModelTests: XCTestCase {
         var chosen = Recipe.default; chosen.look = .graphite; chosen.shape = .wide
         RecipePersistence.save(chosen, to: model.defaults)
         model.summon()
+        await waitForPreview(model)
         XCTAssertEqual(model.recipe.look, .graphite); XCTAssertEqual(model.recipe.shape, .wide)
         XCTAssertEqual(model.layout?.width, 1920)
     }

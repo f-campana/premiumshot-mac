@@ -1,14 +1,10 @@
-# PremiumShot build entry points. Everything reviewers need runs from here.
-#   make test       unit and golden tests
-#   make app        builds build/PremiumShot.app (ad-hoc signed)
-#   make fixtures   regenerates the synthetic fixtures (rarely needed; they are committed)
-#   make goldens    accepts an intentional change to the golden images
+# PremiumShot Mac build entry points.
 CONFIG ?= release
 
-.PHONY: test app fixtures goldens clean run
+.PHONY: test app run goldens clean
 
 test:
-	swift test
+	swift test -c $(CONFIG)
 
 app:
 	scripts/bundle-app.sh $(CONFIG)
@@ -16,11 +12,9 @@ app:
 run: app
 	open build/PremiumShot.app
 
-fixtures:
-	swift run fixturegen fixtures
-
+# Use only when accepting an intentional rendering change.
 goldens:
-	UPDATE_GOLDENS=1 swift test --filter GoldenTests
+	UPDATE_GOLDENS=1 swift test -c $(CONFIG) --filter GoldenTests
 
 clean:
 	rm -rf .build build out
