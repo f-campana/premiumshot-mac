@@ -33,7 +33,13 @@ public final class PanelModel {
     public var dropTarget = false
     public var canExpand = true
     public var backingScale: CGFloat = 2
+    #if DEBUG
     public var demoImageURL: URL?
+    #endif
+    public var isWelcoming = false
+    public var hotkeyUnavailable = false
+    public let loginItems: LoginItemController
+    public var onFinishWelcome: (() -> Void)?
     public var pasteboard: NSPasteboard = .general
     public var defaults: UserDefaults = .standard
     public var pasteboardWriter: (Data, UUID, (width: Int, height: Int), NSPasteboard) -> Bool = {
@@ -49,6 +55,8 @@ public final class PanelModel {
     private(set) var gradientPresentationActive = false
     @ObservationIgnored private var gradientStart: CGImage?
     public var needsSaveFolder = false
+    public private(set) var needsScreenshotFolder = false
+    public var findLatestScreenshot: @Sendable (URL) throws -> URL? = { try LatestScreenshot.find(in: $0) }
     private let store: SessionStore
     private var session: SourceSession?
     private var pendingPolished: SourceImage?
@@ -67,7 +75,10 @@ public final class PanelModel {
     private var statusToken = 0
     private var copying: WorkToken?
     private var saving: WorkToken?
-    public init(store: SessionStore) { self.store = store }
+    public init(store: SessionStore, loginItems: LoginItemController? = nil) {
+        self.store = store
+        self.loginItems = loginItems ?? LoginItemController()
+    }
     public static let canvasBox = CGSize(width: 544, height: 300)
     public var recipe: Recipe { state.recipe }
     public var preview: CGImage? { presentationImage ?? frame?.render.image }
@@ -92,6 +103,8 @@ public final class PanelModel {
     }
 
     public func summon() {
+        isWelcoming = false
+        needsScreenshotFolder = false
         removalThumbnail = nil
         invalidate()
         setStatus(nil)
@@ -100,12 +113,12 @@ public final class PanelModel {
         state.drawer = false
         state.inspect = false
         let recipe = RecipePersistence.load(from: defaults)
-        let resolved: SummonSource
+        var resolved = SummonSource.resolve(pasteboard: pasteboard, store: store)
+        #if DEBUG
         if let url = demoImageURL, let source = try? ImageLoader.load(url: url) {
             resolved = .image(source)
-        } else {
-            resolved = SummonSource.resolve(pasteboard: pasteboard, store: store)
         }
+        #endif
         switch resolved {
         case .session(let session): begin(session)
         case .image(let source): begin(store.add(source: source, recipe: recipe))
@@ -119,6 +132,8 @@ public final class PanelModel {
         }
     }
     public func dismiss() {
+        isWelcoming = false
+        needsScreenshotFolder = false
         removalThumbnail = nil
         persist()
         invalidate()
@@ -152,6 +167,7 @@ public final class PanelModel {
         }
     }
     public func replace(with source: SourceImage) {
+        needsScreenshotFolder = false
         removalThumbnail = nil
         invalidate()
         frame = nil
@@ -240,23 +256,67 @@ public final class PanelModel {
     }
     public func openLatest() {
         let token = reserveImport()
-        let folder = LatestScreenshot.folder
+        needsScreenshotFolder = false
+        let finder = findLatestScreenshot
         Task {
             do {
-                let found = try await Task.detached(priority: .userInitiated) {
-                    try LatestScreenshot.find(in: folder)
+                let folder = try ScreenshotFolder.selected(in: defaults)
+                let source = try await Task.detached(priority: .userInitiated) {
+                    let access = folder.startAccessingSecurityScopedResource()
+                    defer { if access { folder.stopAccessingSecurityScopedResource() } }
+                    guard let url = try finder(folder) else { return Optional<SourceImage>.none }
+                    return try ImageLoader.load(url: url)
                 }.value
                 guard token == state.token else { return }
-                if let found {
-                    load(url: found, reservedToken: token)
+                if let source {
+                    replace(with: source)
                 } else {
                     importFailed("No screenshot found in \(folder.lastPathComponent).", token: token)
                 }
             } catch {
                 guard token == state.token else { return }
-                importFailed(error.localizedDescription, token: token)
+                needsScreenshotFolder = ScreenshotFolder.isDenied(error)
+                importFailed(needsScreenshotFolder
+                    ? "PremiumShot can't read your screenshots folder."
+                    : "Couldn't open your screenshots folder. Choose a folder to try again.", token: token)
+                // A deleted or stale selected folder can also be recovered with the picker.
+                needsScreenshotFolder = true
             }
         }
+    }
+    public func openScreenshotPrivacySettings() { ScreenshotFolder.openPrivacySettings() }
+
+    public func chooseScreenshotFolder() {
+        let token = state.token
+        let picker = NSOpenPanel()
+        picker.canChooseDirectories = true
+        picker.canChooseFiles = false
+        picker.allowsMultipleSelection = false
+        picker.prompt = "Choose folder"
+        picker.message = "Choose the folder where macOS saves your screenshots."
+        NSApp.activate()
+        picker.begin { [weak self] response in
+            guard response == .OK, let url = picker.url, let self, self.state.token == token else { return }
+            do {
+                try ScreenshotFolder.remember(url, in: self.defaults)
+                self.openLatest()
+            } catch {
+                self.needsScreenshotFolder = true
+                self.importError("Couldn't remember this folder. Choose a folder to try again.")
+            }
+        }
+    }
+
+    public func showWelcome() {
+        dismiss()
+        isWelcoming = true
+        loginItems.refresh()
+    }
+
+    public func finishWelcome() {
+        FirstLaunch.complete(in: defaults)
+        isWelcoming = false
+        onFinishWelcome?()
     }
     private func importError(_ message: String) {
         if isReady {

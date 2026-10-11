@@ -1,37 +1,22 @@
 #!/bin/bash
-# Builds build/PremiumShot.app from the SwiftPM executable, ad-hoc signed with the hardened runtime.
+# Local/CI packaging uses the same SDK, metadata and ad-hoc signature checks.
 set -euo pipefail
-CONFIG="${1:-release}"
 cd "$(dirname "$0")/.."
-
-swift build -c "$CONFIG" --product PremiumShotApp
-BIN="$(swift build -c "$CONFIG" --show-bin-path)/PremiumShotApp"
-APP="build/PremiumShot.app"
-
+CONFIG="${1:-release}"
+case "$CONFIG" in release|debug) ;; *) echo "Expected release or debug" >&2; exit 2;; esac
+ARCH="${ARCH:-$(uname -m)}"
+case "$ARCH" in arm64|x86_64) ;; *) echo "Unsupported architecture: $ARCH" >&2; exit 2;; esac
+swift build -c "$CONFIG" --arch "$ARCH" --product PremiumShotApp
+BIN="$(swift build -c "$CONFIG" --arch "$ARCH" --show-bin-path)/PremiumShotApp"
+if [[ "$CONFIG" == debug ]]; then APP="build/Debug/PremiumShot Dev.app"; else APP="build/PremiumShot.app"; fi
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/PremiumShotApp"
-
-cat > "$APP/Contents/Info.plist" <<PLIST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>CFBundleExecutable</key><string>PremiumShotApp</string>
-  <key>CFBundleIdentifier</key><string>com.fabien.premiumshot</string>
-  <key>CFBundleName</key><string>PremiumShot</string>
-  <key>CFBundleDisplayName</key><string>PremiumShot</string>
-  <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>0.1.5</string>
-    <key>CFBundleVersion</key><string>7</string>
-  <key>LSMinimumSystemVersion</key><string>26.0</string>
-  <key>LSUIElement</key><true/>
-  <key>NSHighResolutionCapable</key><true/>
-  <key>NSPrincipalClass</key><string>NSApplication</string>
-</dict>
-</plist>
-PLIST
-
+xcrun actool Resources/AppIcon.icon --compile "$APP/Contents/Resources" --platform macosx \
+  --target-device mac --minimum-deployment-target 26.0 --app-icon AppIcon \
+  --output-partial-info-plist "build/icon-$CONFIG.plist"
+python3 scripts/bundle-metadata.py "$APP" "$CONFIG" "build/icon-$CONFIG.plist"
 codesign --force --sign - --options runtime "$APP"
 codesign --verify --strict "$APP"
-echo "built $APP"
+python3 scripts/verify-bundle.py "$APP" "$CONFIG" "$ARCH"
+echo "Built $APP"

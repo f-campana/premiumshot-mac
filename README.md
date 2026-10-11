@@ -1,63 +1,59 @@
 # PremiumShot for Mac
 
-A native Mac utility that turns a screenshot into a polished image. SwiftUI and AppKit provide the editor; Core Graphics and ImageIO render and export the result. No third-party dependencies or network services are required.
+A screenshot, with a beautiful finish. Choose a background, tune the space, corners and shadow, then copy a PNG wherever you work.
 
-## Build and run
+A native menu-bar app for **macOS 26 on Apple Silicon**. Free, MIT-licensed, no account or analytics. Image processing stays on your Mac. This repository is the Mac source project; the Chrome extension and website are separate.
 
-Requires macOS 26 and Swift 6.2 or later, with the macOS SDK and command-line developer tools installed.
+## Use
+
+Copy a screenshot, press **⌘⌥⇧Space**, then **Return** to copy the result. On first launch a short welcome explains the flow. Paste, drag an image into the panel, or choose **Open latest screenshot**.
+
+- Six backgrounds: Dawn, Tide, Paper, Graphite, Clear and a two-colour Custom gradient.
+- **E** opens Adjust for Shape, Space, Corners, Shadow and Custom colours.
+- Focus the preview and press **Space** for Inspect: fit, actual size, zoom and pan.
+- **Return / ⌘C** copies; **Save** writes a PNG; drag the preview into another app.
+- **⌘Z / ⇧⌘Z** undoes and redoes recipe edits.
+- The trash button removes the screenshot from the session and leaves its file and your clipboard alone.
+- **Esc** closes Inspect first, then the panel.
+
+Open at Login is optional and off by default. Paste and drop work without folder access. Open latest screenshot requests screenshots-folder access only when needed; denial leaves paste/drop usable and offers Privacy Settings or a folder picker.
+
+## Build
+
+Requires macOS 26, Xcode 26.6 (or a compatible Swift 6.2+ toolchain), and the macOS SDK. There are no third-party runtime dependencies.
 
 ```sh
-make test
+make check
 make app
 open build/PremiumShot.app
 ```
 
-`make app` creates an ad-hoc signed bundle for local use and verifies its signature. It does not notarize the app for distribution. `CONFIG=debug make app` builds a debug bundle; release is the default. Build products are ignored by Git.
+The marketing version lives in [VERSION](VERSION). About reads the version and Git-derived build number from the bundle.
 
-Current version: **0.1.5 (7)**.
+`make app` creates an ad-hoc signed release app with the hardened runtime. It does not notarize it. `make release` runs the checks and packages a committed private beta as a DMG, checksum and manifest. See [release process](docs/release-process.md) and [beta installation](docs/beta-installation.md). Developer ID, notarization and automatic updates are deferred until beta feedback. No public release has been published.
 
-## Use
-
-Launch the app, then summon its panel with **⌘⌥⇧Space** or the menu-bar item. It imports the image on the clipboard. You can also paste, drop an image, or choose **Open latest screenshot** from the empty state.
-
-- Choose Dawn, Tide, Paper, Graphite, Clear, or Custom.
-- Open **Adjust** with **E** to change Shape, Space, Corners and Shadow. Custom provides two hue handles and Randomize.
-- Click the preview and press **Space** to enter Inspect. Fit, actual size, zoom and pan are available there.
-- Use **Return** or **⌘C** to copy, **Save** to write a PNG to Desktop, or drag the preview into another app.
-- Use **⌘Z** and **⇧⌘Z** to undo and redo style changes.
-- Use the trash button, or focus the preview and press **Delete**, to remove the screenshot from the session.
-- **Esc** closes Inspect first, then dismisses the panel.
-
-Removing a screenshot leaves its file and the clipboard untouched. The panel uses a fixed position on the pointer's display. Look, custom hue and Shadow edits preserve the composition; Space controls its margins.
-
-## Source layout
-
-- `Sources/PremiumShotApp`: application lifecycle, menu-bar item and global shortcut.
-- `Sources/PremiumShotMac`: native editor, presentation, image import, history, clipboard and file output.
-- `Sources/PremiumShotCore`: layout, colour, rendering, image decoding and PNG encoding.
-- `Tests`: rendering and native integration regressions.
-- `fixtures`: synthetic input images and reference renders required by the tests.
-- `scripts/bundle-app.sh`: app packaging and local signing.
-
-The package exposes only the Mac app executable. Tests use private pasteboards and isolated preferences. Reference images can be updated with `make goldens` after an intentional rendering change; do not update them to conceal a regression.
-
-## Native QA support
-
-Existing developer flags remain available for maintaining the app:
+## Development and verification
 
 ```sh
-build/PremiumShot.app/Contents/MacOS/PremiumShotApp --qa --image fixtures/wide-dashboard.png
-build/PremiumShot.app/Contents/MacOS/PremiumShotApp --image fixtures/wide-dashboard.png --snapshot /tmp/premiumshot.png
+make dev-app
+"build/Debug/PremiumShot Dev.app/Contents/MacOS/PremiumShotApp" --qa --image fixtures/wide-dashboard.png
+"build/Debug/PremiumShot Dev.app/Contents/MacOS/PremiumShotApp" --welcome --snapshot /tmp/welcome.png
+make cli
 ```
 
-`--qa` uses private preferences and clipboard state. `--snapshot` writes the card content and a companion JSON of runtime bounds, then exits; it does not capture the desktop or establish live interaction or motion quality. Add `--expanded`, `--inspect`, `--dark`, `--look <id>` or `--shape <id>` for a particular state. `--self-test` checks hotkey registration; actual hotkey delivery still needs a native check. `--bench-workflow --image <path>` supports workflow measurement, and `--spike-tools` exposes the existing drag and gesture diagnostics.
+Debug builds use a separate bundle identifier. QA flags use private preferences and pasteboards. `--snapshot` captures hosted card content plus runtime bounds, not the desktop or motion. `--folder-denied` simulates a denied read for reviewing recovery; it does not establish a real privacy-permission test. Diagnostics are compiled out of release builds.
 
-## Project status
+Tests cover rendering goldens, geometry, colour, native keyboard routing, import/output races, first launch and recovery. Run native window tests without simultaneous mouse/keyboard use. Real TCC prompts, login across a restart, VoiceOver, physical displays and drag destinations need native acceptance. Hosted captures do not replace those checks.
 
-Extraction verification on 2026-10-09: **124/124 release tests pass**, with no skips; the release bundle builds and passes signature verification. App sources, tests, fixtures and the packaging script match the source project byte for byte. Local verification logs and the copy manifest are in Git-ignored `reports/extraction-2026-10-09/`.
+## Source
 
-Fabien accepted the appearance, behaviour and perceived motion of 0.1.4. Version 0.1.5 fixes the subsequent E and Space transition interruptions. Automated checks and static captures do not establish all native integration: full-screen Spaces, multiple displays, physical drag-and-drop, real trackpad input and all destination apps still need their remaining manual checks. Numerical motion-recording criteria have not been measured.
+- `Sources/PremiumShotCore`: geometry, colour, decoding, rendering and PNG.
+- `Sources/PremiumShotMac`: editor, native input, presentation, history and output.
+- `Sources/PremiumShotApp`: lifecycle, menu, bundle links and DEBUG-only diagnostics.
+- `Tools/pshot`: development-only renderer CLI for Chrome parity, built from a pinned revision and excluded from the app bundle.
+- `Resources/AppIcon.icon`: original layered Icon Composer artwork.
+- `Tests` and `fixtures`: synthetic inputs, regression tests and rendering references.
 
-Future ideas are recorded only: screenshot cropping in Inspect and Preview-style annotation. Neither is part of this release.
+See [contributing](CONTRIBUTING.md) and [agent instructions](AGENTS.md). Cropping in Inspect and annotation are recorded ideas, outside this release.
 
-This source project was extracted on 2026-10-09 from `../premiumscreenshot`, which retains the historical specs, review evidence, mockup, CLI, fixture generator, website and browser extension. Git history is preserved here; no build or test depends on that directory.
+This clean source project was extracted from the original shared workspace. Its two baseline commits are retained; the old design specs and historical captures stay in that archive and are not build dependencies.

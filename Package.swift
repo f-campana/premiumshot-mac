@@ -6,6 +6,8 @@ let package = Package(
     platforms: [.macOS(.v26)],
     products: [
         .executable(name: "PremiumShotApp", targets: ["PremiumShotApp"]),
+        // Development tool for renderer parity; never copied into the app bundle.
+        .executable(name: "pshot", targets: ["pshot"]),
     ],
     targets: [
         // Rendering, layout, recipes, image input and PNG output.
@@ -13,6 +15,7 @@ let package = Package(
         // Native panel, controls, input and output integration.
         .target(name: "PremiumShotMac", dependencies: ["PremiumShotCore"]),
         .executableTarget(name: "PremiumShotApp", dependencies: ["PremiumShotCore", "PremiumShotMac"]),
+        .executableTarget(name: "pshot", dependencies: ["PremiumShotCore"], path: "Tools/pshot"),
         .testTarget(name: "PremiumShotCoreTests", dependencies: ["PremiumShotCore"]),
         .testTarget(name: "PremiumShotMacTests", dependencies: ["PremiumShotMac", "PremiumShotCore"]),
     ]

@@ -53,7 +53,7 @@ import XCTest
         for action in ["remove", "replace", "dismiss"] {
             let m = PanelModel(store: SessionStore())
             m.defaults = makeDefaults()
-            m.demoImageURL = Fixtures.url("small-dialog.png")
+            putFixture("small-dialog.png", on: m)
             m.summon()
             let folder = FileManager.default.temporaryDirectory.appendingPathComponent(
                 "promise-test-\(UUID())")
@@ -78,7 +78,7 @@ import XCTest
     func testPromisedBatchKeepsFolderUntilAllFilesAndFailureKeepsSource() async throws {
         let m = PanelModel(store: SessionStore())
         m.defaults = makeDefaults()
-        m.demoImageURL = Fixtures.url("small-dialog.png")
+        putFixture("small-dialog.png", on: m)
         m.summon()
         let id = m.currentSession?.id
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("promise-test-\(UUID())")
@@ -113,7 +113,7 @@ import XCTest
         let m = PanelModel(store: SessionStore())
         m.pasteboard = pb
         m.defaults = makeDefaults()
-        m.demoImageURL = Fixtures.url("small-dialog.png")
+        putFixture("small-dialog.png", on: m)
         m.summon()
         for _ in 0..<100 where m.frame == nil { try? await Task.sleep(for: .milliseconds(10)) }
         let id = m.currentSession?.id
@@ -152,7 +152,7 @@ import XCTest
         let m = PanelModel(store: SessionStore())
         m.pasteboard = pb
         m.defaults = makeDefaults()
-        m.demoImageURL = Fixtures.url("small-dialog.png")
+        putFixture("small-dialog.png", on: m)
         m.summon()
         for _ in 0..<100 where m.frame == nil { try? await Task.sleep(for: .milliseconds(10)) }
         m.edit { $0.shape = .wide }
@@ -191,7 +191,7 @@ import XCTest
     func testThinToSquareAnimationKeepsTransientBitmapsInsideThePreviewBudget() async throws {
         let m = PanelModel(store: SessionStore())
         m.defaults = makeDefaults()
-        m.demoImageURL = Fixtures.url("thin-strip.png")
+        putFixture("thin-strip.png", on: m)
         m.summon()
         for _ in 0..<200 where m.frame?.settled != true { try? await Task.sleep(for: .milliseconds(10)) }
         m.edit { $0.shape = .square }

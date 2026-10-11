@@ -9,7 +9,7 @@ final class ModelTests: XCTestCase {
     func makeModel(image: String = "small-dialog.png", pasteboard: NSPasteboard) -> PanelModel {
         let model = PanelModel(store: SessionStore())
         model.pasteboard = pasteboard; model.defaults = makeDefaults()
-        model.demoImageURL = Fixtures.url(image)
+        putFixture(image, on: model)
         return model
     }
 

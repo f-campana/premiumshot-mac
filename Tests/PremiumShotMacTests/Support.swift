@@ -37,3 +37,9 @@ func makeDefaults() -> UserDefaults {
     defaults.removePersistentDomain(forName: name)
     return defaults
 }
+
+@MainActor func putFixture(_ name: String, on model: PanelModel) {
+    if model.pasteboard.name == NSPasteboard.general.name { model.pasteboard = makePasteboard() }
+    model.pasteboard.clearContents()
+    model.pasteboard.setData(try! Data(contentsOf: Fixtures.url(name)), forType: .png)
+}
