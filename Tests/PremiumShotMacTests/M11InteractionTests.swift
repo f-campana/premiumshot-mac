@@ -192,8 +192,10 @@ import XCTest
         let m = PanelModel(store: SessionStore())
         m.defaults = makeDefaults()
         putFixture("thin-strip.png", on: m)
+        defer { m.pasteboard.releaseGlobally(); m.dismiss() }
         m.summon()
         for _ in 0..<200 where m.frame?.settled != true { try? await Task.sleep(for: .milliseconds(10)) }
+        let reducesMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         m.edit { $0.shape = .square }
         var observed = 0
         for _ in 0..<120 {
@@ -204,7 +206,11 @@ import XCTest
             }
             try? await Task.sleep(for: .milliseconds(10))
         }
-        XCTAssertGreaterThan(observed, 0)
+        if reducesMotion {
+            XCTAssertEqual(observed, 0, "Reduce Motion commits the target without transient bitmaps")
+        } else {
+            XCTAssertGreaterThan(observed, 0)
+        }
         XCTAssertEqual(m.frame?.recipe.shape, .square)
         XCTAssertNil(m.presentationImage)
     }
