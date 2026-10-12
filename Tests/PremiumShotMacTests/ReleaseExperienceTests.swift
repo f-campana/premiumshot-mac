@@ -6,6 +6,14 @@ import XCTest
 @testable import PremiumShotMac
 
 @MainActor final class ReleaseExperienceTests: XCTestCase {
+    func testDeveloperDragCleanupCannotTouchTheProductionCache() {
+        let production = DragTempFiles.directory(bundleIdentifier: "app.premiumshot.mac")
+        let development = DragTempFiles.directory(bundleIdentifier: "app.premiumshot.mac.dev")
+        XCTAssertNotEqual(production, development)
+        XCTAssertEqual(production.deletingLastPathComponent().lastPathComponent, "app.premiumshot.mac")
+        XCTAssertEqual(development.deletingLastPathComponent().lastPathComponent, "app.premiumshot.mac.dev")
+    }
+
     func testWelcomeDoesNotReadClipboardOrFolderAndOnlyStartCompletesIt() throws {
         let pb = makePasteboard()
         defer { pb.releaseGlobally() }
