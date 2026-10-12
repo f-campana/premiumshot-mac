@@ -27,7 +27,7 @@ MOUNT="$PWD/build/dmg-volume"
 mkdir -p "$MOUNT"
 cleanup() { hdiutil detach "$MOUNT" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
-hdiutil create -volname PremiumShot -srcfolder "$STAGE" -format UDRW -ov build/installer.dmg
+hdiutil create -volname PremiumShot -fs HFS+ -srcfolder "$STAGE" -format UDRW -ov build/installer.dmg
 hdiutil attach build/installer.dmg -mountpoint "$MOUNT" -nobrowse
 python3 -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: \
   --require-hashes --target build/installer-tools -r scripts/installer-requirements.txt

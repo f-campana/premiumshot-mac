@@ -19,6 +19,8 @@ with DSStore.open(str(destination), "w+") as layout:
     }
     layout["."]["icvp"] = {
         "backgroundType": 2, "backgroundImageAlias": background.to_bytes(),
+        # Finder requires the complete icon-view dictionary, including RGB defaults.
+        "backgroundColorRed": 1.0, "backgroundColorGreen": 1.0, "backgroundColorBlue": 1.0,
         "gridSpacing": 54.0, "textSize": 12.0, "gridOffsetX": 0.0,
         "gridOffsetY": 0.0, "showItemInfo": False, "viewOptionsVersion": 1,
         "arrangeBy": "none", "labelOnBottom": True, "iconSize": 80.0,
