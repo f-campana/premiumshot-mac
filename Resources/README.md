@@ -14,6 +14,6 @@ The menu glyph is drawn as an 18 pt template by `Sources/PremiumShotApp/MenuBarG
 
 ## Installer layout
 
-`DMGLayout.ds-store` is the Finder layout copied to the disk image root. It contains only the three installer filenames, their positions and the folder's view settings: a 600 × 360 pt white icon view, with the app and Applications shortcut above the installation notes. It contains no source paths or personal Finder metadata. It is packaging artwork and is never copied into the app.
+`Installer.tiff` contains a 600 × 400 pt background at 1× and 2×. The packaging step generates Finder's layout on the mounted image so the background alias carries that image's real volume and file IDs. The alias names the volume and the path relative to its root; it contains no home or source-checkout path. The detailed installation notes remain in the image for reference, hidden from the two-icon installation view. The volume uses the compiled app icon. These resources are packaging artwork and never enter the app bundle.
 
-The template was generated once with `ds-store` 1.3.1 from native Finder view settings. Normal builds and CI copy the template directly and require no Python packages. Review the mounted image in Finder whenever changing it.
+Regenerate the background with `swift scripts/make-installer-art.swift Resources/Installer.tiff`. Release packaging installs hash-pinned `ds-store` and `mac-alias` into the generated build directory to write the layout. They are packaging tools, excluded from the app and DMG. App builds and `make check` do not need these packages. Review the mounted image in Finder whenever changing it.

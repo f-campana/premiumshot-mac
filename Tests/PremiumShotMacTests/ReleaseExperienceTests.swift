@@ -51,6 +51,34 @@ import XCTest
         XCTAssertFalse(FirstLaunch.needsWelcome(in: model.defaults))
     }
 
+    func testWelcomeCheckboxIsReachableAndReflectsRegistrationFailure() async throws {
+        var registrations = 0
+        let login = LoginItemController(status: { .off }, register: {
+            registrations += 1
+            throw CocoaError(.fileWriteNoPermission)
+        }, unregister: {})
+        let model = PanelModel(store: SessionStore(), loginItems: login)
+        model.defaults = makeDefaults()
+        model.showWelcome()
+        let host = NSHostingView(rootView: PanelView(model: model))
+        host.sizingOptions = []
+        host.frame = NSRect(origin: .zero, size: PanelMetrics.card)
+        for _ in 0..<10 { host.layoutSubtreeIfNeeded(); try await Task.sleep(for: .milliseconds(10)) }
+        func find(_ view: NSView) -> NSButton? {
+            if view.identifier?.rawValue == "ps.welcome-login" { return view as? NSButton }
+            return view.subviews.lazy.compactMap(find).first
+        }
+        let checkbox = try XCTUnwrap(find(host))
+        XCTAssertEqual(checkbox.accessibilityRole(), .checkBox)
+        XCTAssertTrue(checkbox.canBecomeKeyView)
+        XCTAssertEqual(checkbox.state, .off)
+        checkbox.performClick(nil)
+        XCTAssertEqual(registrations, 1)
+        XCTAssertEqual(checkbox.state, .off, "A failed registration must leave the actual checkbox unchecked")
+        XCTAssertNotNil(login.message)
+        model.dismiss()
+    }
+
     func testLoginItemUsesSystemStateAfterApprovalFailureAndExternalChanges() {
         var system: LoginItemController.State = .off
         var registrations = 0

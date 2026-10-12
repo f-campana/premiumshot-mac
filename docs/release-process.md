@@ -10,11 +10,19 @@ make dev-app
 make release
 ```
 
-`VERSION` is the only marketing-version source. The bundle's build number is `git rev-list --count HEAD`; About reads both values from the bundle. The extracted repository starts with two commits, so these build numbers restart from that history when the marketing version advances from 0.1.5 to 0.1.6. Version comparisons must use the marketing version before the build number. Local previews record a dirty-tree bit; release refuses a dirty tree.
+`VERSION` is the only marketing-version source. `BUILD_NUMBER` records the build as `YYYYMMDDNN`, with a valid calendar date and a sequence from `01` to `99`. Increment it for every distributed candidate, even if the marketing version stays the same. The first recorded value is `2026101201`, above both legacy build 7 and the earlier review's build 4. About reads both values from the bundle.
 
-`make release` cleans generated build products, runs the same quality gate, bundles only the app executable and compiled icon, ad-hoc signs with the hardened runtime and no entitlements, creates a compressed DMG with an Applications link, verifies the DMG and emits a SHA-256 checksum and JSON build manifest. The beta currently ships Apple Silicon: Intel/Rosetta is unavailable locally, so universal support is not claimed.
+The recorded number is stable when the same source is rebuilt locally or in CI; neither the build clock nor the Git commit count changes it. Packaging rejects an older number than any release tag, and rejects reusing a tagged number for different source. Fetch all tags before release; CI already does so. Local previews record a dirty-tree bit; release refuses a dirty tree.
+
+The permanent bundle identifier is `app.premiumshot.mac`; the separate development app uses `app.premiumshot.mac.dev`. This deliberately changes identity from the unpublished `com.fabien.premiumshot` app. Preferences, login registration and privacy grants are not copied automatically. Before replacing that app, disable its login item; re-enable login and grant folder access in the new app as needed.
+
+The DMG layout is generated while its writable volume is mounted, using that volume's real background alias. Hash-pinned packaging libraries are installed in `build/installer-tools` for this step and never enter the app or image. This avoids a stale alias that leaves Finder's background blank.
+
+`make release` cleans generated build products, runs the same quality gate, bundles only the app executable and compiled icon, ad-hoc signs with the hardened runtime and no entitlements, creates a compressed DMG with a designed 1×/2× background, custom volume icon and Applications link, verifies the DMG and emits a SHA-256 checksum and JSON build manifest. The beta currently ships Apple Silicon: Intel/Rosetta is unavailable locally, so universal support is not claimed. Fabien can test an Intel or universal candidate later if needed.
 
 A source change requires a new commit and a new candidate. Never regenerate fixtures or goldens as part of packaging. `SUPPORT_URL=https://...` may be supplied only after the real support destination is approved and working; otherwise the menu item remains disabled.
+
+Beta feedback uses the owner-selected `support@premiumshot.app`, linked from About and the installation notes. Email forwarding and a receive/reply check must pass before sending a beta to testers. The contact link does not establish mail delivery. Tips remain a separate, unset destination.
 
 ## GitHub Actions
 

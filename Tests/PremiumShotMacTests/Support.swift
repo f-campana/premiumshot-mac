@@ -26,13 +26,13 @@ enum Fixtures {
 
 /// A private, uniquely named pasteboard so tests never touch the real clipboard.
 func makePasteboard() -> NSPasteboard {
-    let pb = NSPasteboard(name: NSPasteboard.Name("com.fabien.premiumshot.test.\(UUID().uuidString)"))
+    let pb = NSPasteboard(name: NSPasteboard.Name("app.premiumshot.mac.test.\(UUID().uuidString)"))
     pb.clearContents()
     return pb
 }
 
 func makeDefaults() -> UserDefaults {
-    let name = "com.fabien.premiumshot.test.\(UUID().uuidString)"
+    let name = "app.premiumshot.mac.test.\(UUID().uuidString)"
     let defaults = UserDefaults(suiteName: name)!
     defaults.removePersistentDomain(forName: name)
     return defaults

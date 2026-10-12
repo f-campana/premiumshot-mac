@@ -9,9 +9,10 @@ enum AppInformation {
 
     static var aboutOptions: [NSApplication.AboutPanelOptionKey: Any] {
         let credits = NSMutableAttributedString(string: "Screenshots, worth sharing.\n\n")
-        for (label, key) in [("Website", "PSWebsiteURL"), ("Source on GitHub", "PSSourceURL")] {
+        for (label, key) in [("Website", "PSWebsiteURL"), ("Source on GitHub", "PSSourceURL"),
+                             ("Send feedback", "PSFeedbackURL")] {
             if let value = Bundle.main.object(forInfoDictionaryKey: key) as? String,
-               let url = URL(string: value), url.scheme == "https" {
+               let url = URL(string: value), url.scheme == "https" || (key == "PSFeedbackURL" && url.scheme == "mailto") {
                 credits.append(NSAttributedString(string: label + "\n", attributes: [.link: url]))
             }
         }

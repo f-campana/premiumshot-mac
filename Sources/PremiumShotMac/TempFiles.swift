@@ -4,7 +4,7 @@ import Foundation
 public enum DragTempFiles {
     public static var directory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.fabien.premiumshot", isDirectory: true).appendingPathComponent(
+            .appendingPathComponent("app.premiumshot.mac", isDirectory: true).appendingPathComponent(
                 "drag", isDirectory: true)
     }
 

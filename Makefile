@@ -15,6 +15,7 @@ run: app
 cli:
 	swift build -c release --arch $(ARCH) --product pshot
 check: test app cli
+	python3 scripts/check-release-metadata.py
 	python3 scripts/check-cli.py
 	git diff --check
 release:

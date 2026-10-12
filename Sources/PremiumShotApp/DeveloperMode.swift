@@ -15,7 +15,7 @@ import PremiumShotMac
     func startDeveloperMode(hotkeyStatus: Int32) -> Bool {
         let isolated = has("--snapshot") || has("--bench-workflow") || has("--qa") || has("--welcome")
         if isolated {
-            let name = "com.fabien.premiumshot.snapshot.\(UUID())"
+            let name = "app.premiumshot.mac.snapshot.\(UUID())"
             snapshotDefaultsName = name
             model.defaults = UserDefaults(suiteName: name)!
             var recipe = Recipe.default
@@ -71,7 +71,7 @@ import PremiumShotMac
                 NSApp.terminate(nil)
                 return
             }
-            let pb = NSPasteboard(name: NSPasteboard.Name("com.fabien.premiumshot.bench.\(UUID())"))
+            let pb = NSPasteboard(name: NSPasteboard.Name("app.premiumshot.mac.bench.\(UUID())"))
             defer { pb.releaseGlobally() }
             pb.clearContents()
             pb.setData(data, forType: .png)

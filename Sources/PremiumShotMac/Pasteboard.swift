@@ -49,7 +49,7 @@ struct ImageImportPayload: Sendable {
 
 public enum PasteboardIO {
     /// Private pasteboard type carrying the UUID of the in-memory source session that produced a Copy.
-    public static let sessionMarkerType = NSPasteboard.PasteboardType("com.fabien.premiumshot.session")
+    public static let sessionMarkerType = NSPasteboard.PasteboardType("app.premiumshot.mac.session")
 
     static let imageDataTypes: [NSPasteboard.PasteboardType] = [
         .png, .tiff,

@@ -47,7 +47,7 @@ window.addPath(path); window.setStrokeColor(color(0xffffff, 0.34)); window.setLi
 // The inset reads as a screenshot at small sizes. A single bright corner adds the finishing-touch cue.
 let inner = CGPath(roundedRect: rect.insetBy(dx: 58, dy: 58), cornerWidth: 34, cornerHeight: 34, transform: nil)
 window.addPath(inner); window.setStrokeColor(color(0xf2d6cb, 0.62)); window.setLineWidth(12); window.strokePath()
-window.setLineCap(.round); window.setLineJoin(.round); window.setLineWidth(22)
-window.setStrokeColor(color(0xfff8ef)); window.move(to: CGPoint(x: 748, y: 686))
-window.addLine(to: CGPoint(x: 748, y: 726)); window.addLine(to: CGPoint(x: 708, y: 726)); window.strokePath()
+window.setLineCap(.round); window.setLineJoin(.round); window.setLineWidth(52)
+window.setStrokeColor(color(0xfff8ef)); window.move(to: CGPoint(x: 738, y: 626))
+window.addLine(to: CGPoint(x: 738, y: 730)); window.addLine(to: CGPoint(x: 634, y: 730)); window.strokePath()
 save(window, "Screenshot.png")

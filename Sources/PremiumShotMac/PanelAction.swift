@@ -209,7 +209,7 @@ final class ActionButton: NSButton {
 
 @MainActor enum PanelKeyLoop {
     static let order =
-        ["preview", "inspect", "remove"] + LookID.allCases.map { "look-\($0.rawValue)" }
+        ["welcome-login", "welcome-start", "preview", "inspect", "remove"] + LookID.allCases.map { "look-\($0.rawValue)" }
         + [
             "adjust", "save", "copy", "shape", "space", "corners", "shadow", "gradient-start", "gradient-end",
             "randomize", "reset",

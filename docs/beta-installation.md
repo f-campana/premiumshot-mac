@@ -19,6 +19,12 @@ Ad-hoc updates may prompt for folder access again; this must be checked on a
 second Mac. There is no automatic updater yet: quit the app before replacing
 it in Applications.
 
-Feedback: describe the steps, macOS version and app version from About.
-Send private screenshots privately to the maintainer; never post them in a
-public issue. The support address and tip link are not configured yet.
+Feedback: email support@premiumshot.app with the steps, macOS version and
+app version from About. Send private screenshots by email; never post them
+in a public issue.
+
+This candidate uses the permanent app identifier app.premiumshot.mac.
+When replacing the earlier development app (com.fabien.premiumshot), expect
+the welcome and appearance defaults again. Disable Open at Login in the old
+app before replacing it, then enable it in the new app if wanted. macOS may
+ask for screenshots-folder permission again.
