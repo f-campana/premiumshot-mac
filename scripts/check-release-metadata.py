@@ -41,7 +41,8 @@ class ReleaseMetadataTests(unittest.TestCase):
         self.assertEqual(self.info()["CFBundleVersion"], "2026101201")
         self.assertGreater(int(self.info()["CFBundleVersion"]), 7)
         self.assertEqual(self.info()["CFBundleIdentifier"], "app.premiumshot.mac")
-        self.assertEqual(self.info()["PSFeedbackURL"], "mailto:support@premiumshot.app")
+        self.assertNotIn("PSFeedbackURL", self.info(),
+                         "Feedback must stay disabled until receiving and replying are verified")
         self.assertNotIn("PSSupportURL", self.info())
 
     def testExtraCommitsDoNotChangeARecordedBuild(self):

@@ -64,10 +64,10 @@ Tests cover rendering goldens, geometry, colour, native keyboard routing, import
 - `Resources/AppIcon.icon`: original layered Icon Composer artwork.
 - `Tests` and `fixtures`: synthetic inputs, regression tests and rendering references.
 
-See [contributing](CONTRIBUTING.md) and [agent instructions](AGENTS.md). Cropping in Inspect and annotation are recorded ideas, outside this release.
+See [contributing](CONTRIBUTING.md), [agent instructions](AGENTS.md) and the [roadmap](docs/roadmap.md). Product additions stay outside release preparation.
 
 ## Feedback
 
-Private beta feedback goes to [support@premiumshot.app](mailto:support@premiumshot.app). Include the app version from About, your macOS version and the steps to reproduce the problem. Keep private screenshots out of public issues.
+Private beta feedback will use `support@premiumshot.app` once receiving and replying are verified. The current candidate keeps Send feedback unavailable until then. Include the app version from About, your macOS version and the steps to reproduce the problem. Keep private screenshots out of public issues.
 
 Licensed under [MIT](LICENSE).

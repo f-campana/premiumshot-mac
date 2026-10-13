@@ -45,9 +45,10 @@ metadata = {
     "NSHumanReadableCopyright": "Copyright © 2026 Fabien Campana",
     "NSDesktopFolderUsageDescription": "PremiumShot reads your latest screenshot when you choose Open latest screenshot.",
     "PSWebsiteURL": "https://premiumshot.app", "PSSourceURL": "https://github.com/f-campana/premiumshot-mac",
-    "PSFeedbackURL": "mailto:support@premiumshot.app",
     "PSBuildCommit": git("rev-parse", "HEAD"), "PSBuildDirty": dirty,
 }
+# PSFeedbackURL stays absent until an incoming support message and reply are verified.
+# Enable it in a reviewed release after that evidence is recorded.
 # The support/tip page stays disabled until its real HTTPS destination is configured.
 if support := os.environ.get("SUPPORT_URL"):
     if not support.startswith("https://"):

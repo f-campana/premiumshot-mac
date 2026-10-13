@@ -22,7 +22,7 @@ The HFS+ DMG layout is generated while its writable volume is mounted, using tha
 
 A source change requires a new commit and a new candidate. Never regenerate fixtures or goldens as part of packaging. `SUPPORT_URL=https://...` may be supplied only after the real support destination is approved and working; otherwise the menu item remains disabled.
 
-Beta feedback uses the owner-selected `support@premiumshot.app`, linked from About and the installation notes. Email forwarding and a receive/reply check must pass before sending a beta to testers. The contact link does not establish mail delivery. Tips remain a separate, unset destination.
+Beta feedback uses the owner-selected `support@premiumshot.app`. Email forwarding and a receive/reply check must pass before sending a beta to testers. Until that evidence exists, bundle metadata omits `PSFeedbackURL`, so About does not offer Send feedback. Enable the selected mailbox in metadata in a reviewed release after recording the incoming message and reply; the metadata check must change with that approved evidence. A contact link alone does not establish mail delivery. Tips remain a separate, unset destination.
 
 ## GitHub Actions
 

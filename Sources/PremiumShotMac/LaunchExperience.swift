@@ -77,15 +77,14 @@ struct WelcomeView: View {
     var body: some View {
         VStack(spacing: 0) {
             Spacer(minLength: 16)
-            Image(systemName: "rectangle.inset.filled")
-                .font(.system(size: 36, weight: .light)).accessibilityHidden(true)
+            Image(nsImage: NSApplication.shared.applicationIconImage)
+                .resizable().scaledToFit().frame(width: 64, height: 64).accessibilityHidden(true)
             Text("Welcome to PremiumShot").font(.system(size: 22, weight: .semibold)).padding(.top, 16)
             Text("PremiumShot lives in your menu bar.").padding(.top, 12)
             HStack(spacing: 6) {
-                Text("Copy a screenshot")
-                Text("·").foregroundStyle(PanelTheme.informationStyle)
+                Text("Copy a screenshot, press")
                 ShortcutKeycap(label: "⌘⌥⇧Space")
-                Text("·").foregroundStyle(PanelTheme.informationStyle)
+                Text("then")
                 ShortcutKeycap(label: "Return ↵")
             }
             .padding(.top, 10).accessibilityElement(children: .ignore)
