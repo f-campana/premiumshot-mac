@@ -16,7 +16,9 @@ struct PanelView: View {
     var body: some View {
         let _ = model.copySequence
         Group {
-            if let presentation {
+            if model.isWelcoming {
+                WelcomeView(model: model)
+            } else if let presentation {
                 ZStack(alignment: .topLeading) {
                     editor.opacity(presentation.compactOpacity)
                         .allowsHitTesting(!model.isInspecting)
@@ -122,6 +124,14 @@ struct PanelView: View {
                     Button("Paste ⌘V") { model.paste() }.panelFocus(model: model)
                     Button("Open latest screenshot…") { model.openLatest() }.panelFocus(model: model)
                 }.padding(.top, 8)
+                if model.needsScreenshotFolder {
+                    HStack(spacing: 12) {
+                        Button("Open Privacy Settings") { model.openScreenshotPrivacySettings() }
+                            .panelFocus(model: model)
+                        Button("Choose a folder…") { model.chooseScreenshotFolder() }
+                            .panelFocus(model: model)
+                    }.padding(.top, 6)
+                }
             }
         }.padding(20).frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(

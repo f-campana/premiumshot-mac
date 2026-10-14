@@ -1,3 +1,4 @@
+#if DEBUG
 import AppKit
 import PremiumShotCore
 
@@ -161,3 +162,5 @@ final class GestureLoggerView: NSView {
     }
     private func refresh(header: String) { log.stringValue = ([header, ""] + lines).joined(separator: "\n") }
 }
+
+#endif

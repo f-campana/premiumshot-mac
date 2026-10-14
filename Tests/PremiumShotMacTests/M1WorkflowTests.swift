@@ -26,7 +26,7 @@ private actor RenderGate {
         let model = PanelModel(store: store)
         model.pasteboard = pb
         model.defaults = makeDefaults()
-        model.demoImageURL = Fixtures.url("small-dialog.png")
+        putFixture("small-dialog.png", on: model)
         return model
     }
     func wait(_ predicate: @escaping () -> Bool) async {
@@ -226,7 +226,6 @@ private actor RenderGate {
         m.summon()
         await m.copy()
         m.removeScreenshot()
-        m.demoImageURL = nil
         m.summon()
         XCTAssertEqual(m.phase, .alreadyPolished)
         pb.clearContents()

@@ -80,7 +80,7 @@ final class PanelMaterialView: NSVisualEffectView {
         }
     }
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-        guard !isSelfDrag(sender) else { return [] }
+        guard !model.isWelcoming, !isSelfDrag(sender) else { return [] }
         let eligible = Self.eligible(sender.draggingPasteboard)
         onDragEligibility?(eligible)
         model.dropTarget = eligible
@@ -93,10 +93,10 @@ final class PanelMaterialView: NSVisualEffectView {
         onDragEnd?()
     }
     override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        !isSelfDrag(sender) && Self.eligible(sender.draggingPasteboard)
+        !model.isWelcoming && !isSelfDrag(sender) && Self.eligible(sender.draggingPasteboard)
     }
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        guard !isSelfDrag(sender), Self.eligible(sender.draggingPasteboard) else { return false }
+        guard !model.isWelcoming, !isSelfDrag(sender), Self.eligible(sender.draggingPasteboard) else { return false }
         model.dropTarget = false
         onDragEnd?()
         let board = sender.draggingPasteboard

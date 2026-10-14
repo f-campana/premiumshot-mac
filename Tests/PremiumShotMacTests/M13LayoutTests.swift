@@ -9,8 +9,8 @@ import XCTest
     func testProductionControllerSettlesAtRequestedContentAndShadowBounds() async throws {
         let model = PanelModel(store: SessionStore())
         model.defaults = makeDefaults()
-        model.demoImageURL = Fixtures.url("wide-dashboard.png")
         model.pasteboard = makePasteboard()
+        putFixture("wide-dashboard.png", on: model)
         defer { model.pasteboard.releaseGlobally() }
         let controller = PanelController(model: model)
         controller.show()

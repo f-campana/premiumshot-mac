@@ -174,6 +174,7 @@ public final class PanelController: NSObject, NSWindowDelegate {
         model.onPresentationChange = { [weak self] in self?.updatePresentation() }
         model.onPresentationSnap = { [weak self] in self?.animator.snap() }
         model.onKeyLoopChange = { [weak self] in self?.scheduleKeyLoop() }
+        model.onFinishWelcome = { [weak self] in self?.hide() }
         model.onFocusPreview = { [weak self] in
             guard let expected = self?.model.state.token else { return }
             Task { @MainActor in
@@ -190,10 +191,15 @@ public final class PanelController: NSObject, NSWindowDelegate {
 
     public func toggle() { isVisible ? hide() : show() }
 
-    public func show() {
+    public func showWelcome() {
+        if isVisible { hide() }
+        show(welcome: true)
+    }
+
+    public func show(welcome: Bool = false) {
         guard !isVisible else { return }
         model.backingScale = Self.screenUnderPointer()?.backingScaleFactor ?? 2
-        model.summon()
+        if welcome { model.showWelcome() } else { model.summon() }
         let screen = Self.screenUnderPointer()
         let area = screen?.visibleFrame ?? .zero
         let card = PanelPlacement.clamp(Self.cardFrame(on: screen), to: area)
@@ -203,6 +209,7 @@ public final class PanelController: NSObject, NSWindowDelegate {
         panel.addChildWindow(shadow, ordered: .below)
         panel.makeKeyAndOrderFront(nil)  // no NSApp.activate: the previous app stays frontmost
         isVisible = true
+        panel.autorecalculatesKeyViewLoop = welcome
         if let preview = Self.findPreview(in: panel.contentView) {
             panel.makeFirstResponder(preview)
         } else {
@@ -272,6 +279,7 @@ public final class PanelController: NSObject, NSWindowDelegate {
         isVisible = false
     }
 
+    #if DEBUG
     /// Dev only: writes the card's content to a PNG (used by `--snapshot`). Behind-window blur is not captured.
     public func snapshot(to url: URL) -> Bool {
         guard let view = panel.contentView, let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds)
@@ -297,6 +305,7 @@ public final class PanelController: NSObject, NSWindowDelegate {
         try JSONSerialization.data(withJSONObject: metrics, options: [.prettyPrinted, .sortedKeys]).write(
             to: url)
     }
+    #endif
 
     private func escape() {
         if presentation.active && presentation.sharedImage {
@@ -319,6 +328,7 @@ public final class PanelController: NSObject, NSWindowDelegate {
             escape()
             return true
         }
+        if model.isWelcoming { return false }
         if command {
             // Preserve native editing commands in any field owned by the system.
             guard !(panel.firstResponder is NSTextView) else { return false }
@@ -374,6 +384,7 @@ public final class PanelController: NSObject, NSWindowDelegate {
         keyLoopTask = Task { @MainActor [weak self] in
             await Task.yield()
             guard let self, !Task.isCancelled, self.isVisible, !self.model.isInspecting,
+                !self.model.isWelcoming,
                 let root = self.panel.contentView
             else { return }
             _ = PanelKeyLoop.configure(root: root, window: self.panel)

@@ -3,8 +3,15 @@ import Foundation
 /// Temp PNGs for drag-out. They live in the app's cache directory and are deleted at the next launch.
 public enum DragTempFiles {
     public static var directory: URL {
+        directory(bundleIdentifier: Bundle.main.bundleIdentifier)
+    }
+
+    static func directory(bundleIdentifier: String?) -> URL {
+        let namespace = bundleIdentifier == "app.premiumshot.mac.dev"
+            ? "app.premiumshot.mac.dev" : "app.premiumshot.mac"
+        return
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.fabien.premiumshot", isDirectory: true).appendingPathComponent(
+            .appendingPathComponent(namespace, isDirectory: true).appendingPathComponent(
                 "drag", isDirectory: true)
     }
 
