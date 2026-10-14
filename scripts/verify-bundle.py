@@ -15,6 +15,7 @@ assert info["CFBundleVersion"] == Path("BUILD_NUMBER").read_text().strip()
 assert int(info["CFBundleVersion"]) > 7, "Builds must follow the previously installed build 7"
 assert info["CFBundleIdentifier"] == "app.premiumshot.mac" + (".dev" if config == "debug" else "")
 assert info["NSDesktopFolderUsageDescription"]
+assert info["PSFeedbackURL"] == "mailto:support@premiumshot.app"
 assert info["LSApplicationCategoryType"] == "public.app-category.graphics-design"
 assert "CFBundleURLTypes" not in info
 assert info["LSMinimumSystemVersion"] == "26.0"
@@ -38,6 +39,7 @@ entitlements = subprocess.run(["codesign", "-d", "--entitlements", "-", str(app)
 assert not entitlements.strip(), "No entitlement is expected for this non-sandboxed app"
 print(json.dumps({"version": info["CFBundleShortVersionString"], "build": info["CFBundleVersion"],
     "bundle_identifier": info["CFBundleIdentifier"],
+    "feedback_url": info["PSFeedbackURL"],
     "commit": info["PSBuildCommit"], "dirty": info["PSBuildDirty"], "architecture": actual,
     "signature": "ad-hoc hardened runtime", "notarized": False,
     "bundle_bytes": sum(p.stat().st_size for p in app.rglob("*") if p.is_file()),

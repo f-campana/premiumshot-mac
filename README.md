@@ -68,6 +68,6 @@ See [contributing](CONTRIBUTING.md), [agent instructions](AGENTS.md) and the [ro
 
 ## Feedback
 
-Private beta feedback will use `support@premiumshot.app` once receiving and replying are verified. The current candidate keeps Send feedback unavailable until then. Include the app version from About, your macOS version and the steps to reproduce the problem. Keep private screenshots out of public issues.
+Use **Send feedback** in About to email `support@premiumshot.app`. Receiving and replying were verified on 14 October 2026. Include the app version from About, your macOS version and the steps to reproduce the problem. Keep private screenshots out of public issues.
 
 Licensed under [MIT](LICENSE).

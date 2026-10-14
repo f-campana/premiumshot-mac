@@ -5,7 +5,7 @@ Approved 13 October 2026. The product remains a small, local screenshot finishin
 ## Delivery before expansion
 
 1. Prove the exact beta DMG in Finder, or use a plain app-and-Applications image with instructions in the release notes and download page.
-2. Verify support@premiumshot.app receiving and replying; enable Send feedback only after evidence is recorded.
+2. Support mail was verified on 14 October 2026 through iCloud Custom Email Domain; About now includes Send feedback ([verification](release-process.md#support-mail-verification)).
 3. Establish downloaded installation, first launch, permission recovery and login behaviour on a clean account or second Mac.
 4. Collect and triage beta feedback, then settle updates and signing before product expansion.
 

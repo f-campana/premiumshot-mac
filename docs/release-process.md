@@ -22,7 +22,18 @@ The HFS+ DMG layout is generated while its writable volume is mounted, using tha
 
 A source change requires a new commit and a new candidate. Never regenerate fixtures or goldens as part of packaging. `SUPPORT_URL=https://...` may be supplied only after the real support destination is approved and working; otherwise the menu item remains disabled.
 
-Beta feedback uses the owner-selected `support@premiumshot.app`. Email forwarding and a receive/reply check must pass before sending a beta to testers. Until that evidence exists, bundle metadata omits `PSFeedbackURL`, so About does not offer Send feedback. Enable the selected mailbox in metadata in a reviewed release after recording the incoming message and reply; the metadata check must change with that approved evidence. A contact link alone does not establish mail delivery. Tips remain a separate, unset destination.
+Beta feedback uses `support@premiumshot.app`. Bundle metadata includes its `mailto:` URL, so About offers **Send feedback**. The metadata and packaged-bundle checks require the exact verified address. Tips remain a separate, unset destination.
+
+### Support mail verification
+
+Fabien reported the completed setup and real receive/reply check on **14 October 2026** in the main Mac conversation, following the side-chat setup:
+
+- Existing iCloud+ Custom Email Domain hosts the address; no additional email subscription was added.
+- Apple email DNS records were added at Vercel and the support address was created.
+- A message from Gmail reached `support@premiumshot.app`, and an iCloud webmail reply was sent from that address.
+- The sender display name is **PremiumShot Support**; catch-all receiving is off.
+
+This owner-reported evidence closes the receiving/webmail reply gate. Sending from the support identity on iPhone remains unverified: the first iPhone reply used the personal iCloud address. That separate client check does not block the verified webmail route or the Mac contact link. A `mailto:` link uses the tester's default mail client; it does not send a message automatically. No private message content or credentials are stored here.
 
 ## GitHub Actions
 
