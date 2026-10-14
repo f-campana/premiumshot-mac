@@ -15,7 +15,8 @@ with DSStore.open(str(destination), "w+") as layout:
         "ShowStatusBar": False, "ShowToolbar": False, "ShowTabView": False,
         "ContainerShowSidebar": False, "ShowSidebar": False,
         "PreviewPaneVisibility": False, "ShowPathbar": False, "SidebarWidth": 180,
-        "WindowBounds": "{{200, 200}, {600, 400}}",
+        # Finder saves the full frame: 400 pt artwork plus its 32 pt title bar.
+        "WindowBounds": "{{200, 200}, {600, 432}}",
     }
     layout["."]["icvp"] = {
         "backgroundType": 2, "backgroundImageAlias": background.to_bytes(),

@@ -32,6 +32,7 @@ hdiutil attach build/installer.dmg -mountpoint "$MOUNT" -nobrowse
 python3 -m pip install --disable-pip-version-check --no-cache-dir --only-binary=:all: \
   --require-hashes --target build/installer-tools -r scripts/installer-requirements.txt
 PYTHONPATH="$PWD/build/installer-tools" python3 scripts/make-installer-layout.py "$MOUNT"
+PYTHONPATH="$PWD/build/installer-tools" python3 scripts/verify-installer-layout.py "$MOUNT"
 xcrun SetFile -a C "$MOUNT"
 xcrun SetFile -a V "$MOUNT/.VolumeIcon.icns"
 hdiutil detach "$MOUNT"
